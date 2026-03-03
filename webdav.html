@@ -250,6 +250,108 @@
         align-items: center;
       }
 
+      .upload-file-row {
+        display: flex;
+        gap: 10px;
+        align-items: stretch;
+      }
+
+      .file-picker {
+        position: relative;
+        flex: 1;
+        min-height: 74px;
+        border-radius: 14px;
+        border: 1px dashed rgba(138, 75, 255, 0.45);
+        background:
+          linear-gradient(140deg, rgba(255, 255, 255, 0.9) 0%, rgba(242, 233, 255, 0.86) 100%);
+        padding: 12px 14px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+      }
+
+      .file-picker:hover {
+        border-color: rgba(138, 75, 255, 0.68);
+        box-shadow: 0 8px 20px rgba(138, 75, 255, 0.18);
+        transform: translateY(-1px);
+      }
+
+      .file-picker.is-dragover {
+        border-color: rgba(16, 185, 129, 0.82);
+        box-shadow: 0 10px 22px rgba(16, 185, 129, 0.22);
+        background:
+          linear-gradient(140deg, rgba(236, 253, 245, 0.94) 0%, rgba(216, 255, 243, 0.9) 100%);
+      }
+
+      .file-picker.has-files {
+        border-style: solid;
+      }
+
+      .file-input-native {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        border: 0;
+      }
+
+      .file-choose-btn {
+        border-radius: 999px;
+        border: 1px solid rgba(138, 75, 255, 0.36);
+        background: rgba(255, 255, 255, 0.9);
+        min-height: 42px;
+        padding: 9px 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        white-space: nowrap;
+        box-shadow: 0 4px 12px rgba(138, 75, 255, 0.14);
+      }
+
+      .file-picker-meta {
+        min-width: 0;
+        flex: 1;
+      }
+
+      .file-picker-title {
+        font-size: 0.96rem;
+        font-weight: 700;
+        color: #273247;
+        line-height: 1.3;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .file-picker-hint {
+        margin-top: 4px;
+        color: #60708e;
+        font-size: 0.82rem;
+        line-height: 1.4;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .file-count-badge {
+        flex: 0 0 auto;
+        border-radius: 999px;
+        border: 1px solid rgba(138, 75, 255, 0.25);
+        background: rgba(138, 75, 255, 0.12);
+        color: #5b35b5;
+        font-size: 0.8rem;
+        font-weight: 700;
+        padding: 6px 10px;
+      }
+
+      #uploadFilesBtn {
+        min-width: 124px;
+      }
+
       input,
       button {
         border: 1px solid var(--wf-border);
@@ -325,6 +427,44 @@
         background: rgba(20, 29, 49, 0.86);
         border-color: rgba(130, 152, 196, 0.35);
         color: #dbe6ff;
+      }
+
+      html[data-theme="dark"] .file-picker {
+        border-color: rgba(130, 152, 196, 0.52);
+        background:
+          linear-gradient(140deg, rgba(19, 30, 52, 0.92) 0%, rgba(32, 45, 72, 0.9) 100%);
+      }
+
+      html[data-theme="dark"] .file-picker:hover {
+        border-color: rgba(154, 169, 255, 0.72);
+        box-shadow: 0 8px 20px rgba(100, 123, 255, 0.26);
+      }
+
+      html[data-theme="dark"] .file-picker.is-dragover {
+        border-color: rgba(52, 211, 153, 0.76);
+        box-shadow: 0 10px 22px rgba(16, 185, 129, 0.24);
+        background:
+          linear-gradient(140deg, rgba(13, 49, 47, 0.92) 0%, rgba(23, 68, 62, 0.88) 100%);
+      }
+
+      html[data-theme="dark"] .file-choose-btn {
+        border-color: rgba(154, 169, 255, 0.45);
+        background: rgba(26, 37, 63, 0.94);
+        color: #e4ecff;
+      }
+
+      html[data-theme="dark"] .file-picker-title {
+        color: #e6eeff;
+      }
+
+      html[data-theme="dark"] .file-picker-hint {
+        color: #9db0d0;
+      }
+
+      html[data-theme="dark"] .file-count-badge {
+        border-color: rgba(154, 169, 255, 0.34);
+        background: rgba(154, 169, 255, 0.22);
+        color: #d9e4ff;
       }
 
       html[data-theme="dark"] .card-sub,
@@ -453,6 +593,14 @@
           flex-direction: column;
           align-items: flex-start;
         }
+
+        .upload-file-row {
+          flex-direction: column;
+        }
+
+        #uploadFilesBtn {
+          width: 100%;
+        }
       }
     </style>
     <link rel="stylesheet" href="/mobile-refactor.css" />
@@ -532,8 +680,19 @@
               <p class="card-sub">支持批量上传到 WebDAV。</p>
             </div>
           </div>
-          <div class="row">
-            <input id="fileInput" type="file" multiple />
+          <div class="upload-file-row">
+            <div class="file-picker" id="filePickerBox" role="button" tabindex="0" aria-label="选择或拖拽文件">
+              <input id="fileInput" class="file-input-native" type="file" multiple />
+              <button id="chooseFileBtn" type="button" class="file-choose-btn">
+                <i class="fas fa-folder-open"></i>
+                <span>选择文件</span>
+              </button>
+              <div class="file-picker-meta">
+                <div id="filePickerTitle" class="file-picker-title">未选择任何文件</div>
+                <div id="filePickerHint" class="file-picker-hint">支持多选、拖拽到此区域，上传后自动记录直链</div>
+              </div>
+              <span id="fileCountBadge" class="file-count-badge">0 个</span>
+            </div>
             <button id="uploadFilesBtn" type="button" class="btn-primary">开始上传</button>
           </div>
         </article>
@@ -573,6 +732,11 @@
         var statusDetailText = document.getElementById("statusDetailText");
         var folderPathPreview = document.getElementById("folderPathPreview");
         var folderPathInput = document.getElementById("folderPathInput");
+        var filePickerBox = document.getElementById("filePickerBox");
+        var chooseFileBtn = document.getElementById("chooseFileBtn");
+        var filePickerTitle = document.getElementById("filePickerTitle");
+        var filePickerHint = document.getElementById("filePickerHint");
+        var fileCountBadge = document.getElementById("fileCountBadge");
         var fileInput = document.getElementById("fileInput");
         var uploadFilesBtn = document.getElementById("uploadFilesBtn");
         var urlInput = document.getElementById("urlInput");
@@ -584,6 +748,7 @@
         var clearResultBtn = document.getElementById("clearResultBtn");
         var copyAllBtn = document.getElementById("copyAllBtn");
         var resultLinks = [];
+        var fallbackSelectedFiles = [];
 
         function normalizeFolderPath(value) {
           return String(value || "").replace(/\\/g, "/").replace(/^\/+|\/+$/g, "").trim();
@@ -604,6 +769,75 @@
           if (value == null) return [];
           if (typeof value.length === "number") return Array.prototype.slice.call(value);
           return [value];
+        }
+
+        function formatFileSize(bytes) {
+          var value = Number(bytes || 0);
+          if (!Number.isFinite(value) || value <= 0) return "0 B";
+          var units = ["B", "KB", "MB", "GB", "TB"];
+          var index = 0;
+          while (value >= 1024 && index < units.length - 1) {
+            value /= 1024;
+            index += 1;
+          }
+          return value.toFixed(value >= 100 || index === 0 ? 0 : 1) + " " + units[index];
+        }
+
+        function getSelectedFiles() {
+          var chosen = ensureArray(fileInput.files);
+          if (chosen.length) return chosen;
+          return ensureArray(fallbackSelectedFiles);
+        }
+
+        function updateFilePickerState(files) {
+          var picked = ensureArray(files);
+          var count = picked.length;
+          if (!count) {
+            filePickerBox.classList.remove("has-files");
+            filePickerTitle.textContent = "未选择任何文件";
+            filePickerHint.textContent = "支持多选、拖拽到此区域，上传后自动记录直链";
+            fileCountBadge.textContent = "0 个";
+            return;
+          }
+
+          var totalBytes = picked.reduce(function (sum, file) {
+            return sum + Number((file && file.size) || 0);
+          }, 0);
+          var firstName = (picked[0] && picked[0].name) ? picked[0].name : "文件";
+          filePickerBox.classList.add("has-files");
+          fileCountBadge.textContent = count + " 个";
+          if (count === 1) {
+            filePickerTitle.textContent = firstName;
+            filePickerHint.textContent = "大小：" + formatFileSize(totalBytes) + "，点击“开始上传”继续";
+            return;
+          }
+          filePickerTitle.textContent = "已选择 " + count + " 个文件";
+          filePickerHint.textContent = "总大小：" + formatFileSize(totalBytes) + "，首个文件：" + firstName;
+        }
+
+        function syncFilesFromDrop(files) {
+          var dropped = ensureArray(files).filter(Boolean);
+          if (!dropped.length) return;
+          fallbackSelectedFiles = dropped;
+          try {
+            if (typeof DataTransfer !== "undefined") {
+              var dt = new DataTransfer();
+              dropped.forEach(function (file) {
+                dt.items.add(file);
+              });
+              fileInput.files = dt.files;
+              fallbackSelectedFiles = [];
+            }
+          } catch {
+            // keep fallbackSelectedFiles for browsers that block assignment
+          }
+          updateFilePickerState(getSelectedFiles());
+        }
+
+        function clearSelectedFiles() {
+          fileInput.value = "";
+          fallbackSelectedFiles = [];
+          updateFilePickerState([]);
         }
 
         function toAbsoluteUrl(value) {
@@ -699,7 +933,7 @@
         }
 
         async function uploadFiles() {
-          var files = ensureArray(fileInput.files);
+          var files = getSelectedFiles();
           if (!files.length) {
             setStatus("请先选择要上传的文件。", false);
             return;
@@ -723,7 +957,7 @@
                 pushResult("文件上传成功，但未返回直链。", "ok");
               }
             }
-            fileInput.value = "";
+            clearSelectedFiles();
             setStatus("全部文件上传完成。", true);
           } finally {
             uploadFilesBtn.disabled = false;
@@ -780,8 +1014,54 @@
 
         folderPathInput.addEventListener("input", updateFolderPreview);
 
+        chooseFileBtn.addEventListener("click", function (event) {
+          event.preventDefault();
+          event.stopPropagation();
+          fileInput.click();
+        });
+
+        filePickerBox.addEventListener("click", function (event) {
+          var target = event.target;
+          if (target && target.id === "chooseFileBtn") return;
+          fileInput.click();
+        });
+
+        filePickerBox.addEventListener("keydown", function (event) {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            fileInput.click();
+          }
+        });
+
+        filePickerBox.addEventListener("dragover", function (event) {
+          event.preventDefault();
+          filePickerBox.classList.add("is-dragover");
+        });
+
+        filePickerBox.addEventListener("dragenter", function (event) {
+          event.preventDefault();
+          filePickerBox.classList.add("is-dragover");
+        });
+
+        filePickerBox.addEventListener("dragleave", function (event) {
+          var next = event.relatedTarget;
+          if (next && filePickerBox.contains(next)) return;
+          filePickerBox.classList.remove("is-dragover");
+        });
+
+        filePickerBox.addEventListener("drop", function (event) {
+          event.preventDefault();
+          filePickerBox.classList.remove("is-dragover");
+          var dropped = event.dataTransfer ? ensureArray(event.dataTransfer.files) : [];
+          if (!dropped.length) return;
+          syncFilesFromDrop(dropped);
+          setStatus("已拖入 " + dropped.length + " 个文件，点击“开始上传”即可。", null);
+        });
+
         fileInput.addEventListener("change", function () {
-          var files = ensureArray(fileInput.files);
+          fallbackSelectedFiles = [];
+          var files = getSelectedFiles();
+          updateFilePickerState(files);
           if (!files.length) {
             setStatus("请选择要上传的文件。", null);
             return;
@@ -862,6 +1142,7 @@
           folderPathInput.value = normalizeFolderPath(cachedFolderPath);
           updateFolderPreview();
           renderResultState();
+          updateFilePickerState([]);
 
           var authenticated = await ensureAuth();
           if (!authenticated) return;

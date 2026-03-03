@@ -350,6 +350,34 @@ curl -X POST "http://127.0.0.1:8081/bot<YOUR_BOT_TOKEN>/setWebhook" \
 - LFS 上传：最大 50GB/文件
 - 免费用户仓库总大小：约 50GB
 
+### WebDAV 存储（可选）
+
+适合对接 alist/openlist、NAS、群晖、坚果云等支持 WebDAV 的存储服务。  
+你可以把 WebDAV 作为统一挂载入口，后台继续按目录管理文件，已生成的 `/file/...` 直链不受目录调整影响。
+
+**环境变量：**
+
+| 变量名 | 说明 | 示例 |
+| :--- | :--- | :--- |
+| `WEBDAV_BASE_URL` | WebDAV 基础地址（不带结尾 `/`） | `https://dav.example.com/dav` |
+| `WEBDAV_USERNAME` | WebDAV 用户名（Basic 认证） | `alice` |
+| `WEBDAV_PASSWORD` | WebDAV 密码（Basic 认证） | `your-password` |
+| `WEBDAV_BEARER_TOKEN` | Bearer Token（与用户名/密码二选一） | `eyJhbGciOi...` |
+| `WEBDAV_ROOT_PATH` | 可选，WebDAV 根目录前缀 | `k-vault/uploads` |
+
+**部署步骤：**
+
+1. 在你的 WebDAV 服务端准备一个可写目录，并确认具备 `PUT/GET/DELETE/MKCOL` 权限。
+2. 在 Cloudflare Pages 项目中添加上述 `WEBDAV_*` 变量（认证方式二选一：`用户名+密码` 或 `Bearer Token`）。
+3. 重新部署后，访问 `/api/status` 检查 `webdav.connected` 与 `webdav.enabled`，或直接打开 `/webdav.html` 测试上传。
+4. Docker 自托管场景下，在 `.env` 填写相同变量后重启容器（`npm run docker:up` 或 `docker compose up -d --build`）。
+
+**常见问题：**
+
+- `Not configured`：通常是 `WEBDAV_BASE_URL` 为空，或认证变量未正确填写。
+- `401/403`：认证失败，请检查账号密码或 Token。
+- 上传失败且提示 `MKCOL`：说明服务端不允许建目录或路径权限不足，请调整 WebDAV 权限。
+
 ### GitHub 存储（可选）
 
 支持将文件存到 GitHub 仓库，提供两种模式：
@@ -521,6 +549,11 @@ curl -X POST "http://127.0.0.1:8081/bot<YOUR_BOT_TOKEN>/setWebhook" \
 | `DISCORD_CHANNEL_ID` | Discord 频道 ID | 可选 |
 | `HF_TOKEN` | HuggingFace Token | 可选 |
 | `HF_REPO` | HuggingFace 仓库 ID | 可选 |
+| `WEBDAV_BASE_URL` | WebDAV 基础地址 | 可选 |
+| `WEBDAV_USERNAME` | WebDAV 用户名（Basic 认证） | 可选 |
+| `WEBDAV_PASSWORD` | WebDAV 密码（Basic 认证） | 可选 |
+| `WEBDAV_BEARER_TOKEN` | WebDAV Bearer Token（与用户名/密码二选一） | 可选 |
+| `WEBDAV_ROOT_PATH` | WebDAV 根目录前缀 | 可选 |
 | `GITHUB_TOKEN` | GitHub Token（仓库写权限） | 可选 |
 | `GITHUB_REPO` | GitHub 仓库（`owner/repo`） | 可选 |
 | `GITHUB_MODE` | GitHub 存储模式（`releases`/`contents`） | 可选 |
